@@ -28,41 +28,31 @@ const getEmpresa = async (req,res) => {
   }
         
 }
-const getEmpresagetCompra = async (req, res) => {
+const edit = async (req, res) => {
     console.log(typeof req.body)
-    const {name, apellido, empresa, pais, departamento, ciudad, direccion, postal, telefono, email, pedido } = req.body;
+    const {name, aprobada } = req.body;
     try {
-      const newUser = await users.create({
+      const validateExisteEmpresa = await empresa.findOne({ where: { name: name } })
+      console.log(validateExisteEmpresa.dataValues.id)
+      const update =  await empresa.upsert({
+        id: validateExisteEmpresa.dataValues.id,
         name,
-        apellido,
-        empresa,
-        pais,
-        departamento,
-        ciudad,
-        direccion,
-        postal,
-        telefono,
-        email,
+        razon: validateExisteEmpresa.dataValues.razon,
+        nit: validateExisteEmpresa.dataValues.nit,
+        identificacion: validateExisteEmpresa.dataValues.identificacion,
+        empleados: validateExisteEmpresa.dataValues.empleados,
+        logo: '',
+        aprobada: aprobada
       });
-      let idUser = newUser.dataValues.id
-      pedido.map(async (item) => {
-        await product.create({
-          name:item.name,
-          combo:item.secondName,
-          cantidad:item.cantidadForm,
-          subtotal:item.subtotalForm,
-          id_users:idUser,
-        })
-      })
-      
-     sentMail( name, apellido, empresa, pais, departamento, ciudad, direccion, postal, telefono, email, pedido)
-      console.log("new",newUser.dataValues.id)
-      res.json(newUser);
+      res.send(update)
     } catch (error) {
-       console.log(error)
+      console.log(error)
     }
+      res.end()
+   
   };
 
 module.exports = {
   getEmpresa,
+  edit,
 }
