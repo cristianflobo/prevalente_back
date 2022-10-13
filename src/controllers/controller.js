@@ -8,8 +8,8 @@ const getEmpresa = async (req,res) => {
     const validateExisteEmpresa = await empresa.findOne({ where: { name: "Prevalent" } })
     console.log(validateExisteEmpresa)
     if (validateExisteEmpresa === null) {
-      dataEmpresa.map( async(item) => {
-        const newUser = await empresa.create({
+      await Promise.all (dataEmpresa.map( async(item) => {
+        await empresa.create({
           name:item.name,
           razon:item.razon,
           nit:item.nit,
@@ -18,11 +18,10 @@ const getEmpresa = async (req,res) => {
           logo:item.logo,
           aprobada:item.aprobada
         })  
-      })
-    }else{
-      allEmpresa = await empresa.findAll()
+      }))
     }
-     res.send(allEmpresa).end()
+    allEmpresa = await empresa.findAll()
+    res.send(allEmpresa).end()
   } catch (error) {
     console.log(error)
   }
